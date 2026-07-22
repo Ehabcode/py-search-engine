@@ -13,9 +13,21 @@ def load_documents(data_dir):
     return documents
 
 
+import string
+
+def tokenize(text):
+    text = text.lower()
+    for punctuation_mark in string.punctuation:
+        text = text.replace(punctuation_mark, "")
+    tokens = text.split()
+    return tokens
+
+
 if __name__ == "__main__":
     docs = load_documents(DATA_DIR)
     for filename, text in docs.items():
         print(f"--- {filename} ---")
-        print(text)
+        tokens = tokenize(text)
+        print(tokens)
         print()
+
