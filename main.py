@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import string
 
 DATA_DIR = Path("data")
 
@@ -12,8 +12,6 @@ def load_documents(data_dir):
             documents[file_path.name] = content
     return documents
 
-
-import string
 
 def tokenize(text):
     text = text.lower()
@@ -34,14 +32,20 @@ def build_index(documents):
     return index
 
 
+def search(index, query):
+    query_tokens = tokenize(query)
+    if not query_tokens:
+        return set()
+
+    result = index.get(query_tokens[0], set())
+    for token in query_tokens[1:]:
+        result = result & index.get(token, set())
+    return result
+
+
 if __name__ == "__main__":
     docs = load_documents(DATA_DIR)
     index = build_index(docs)
-    for word, files in index.items():
-        print(f"{word}: {files}")
 
-
-
-
-
- 
+    results = search(index, "python language")
+    print(results)
