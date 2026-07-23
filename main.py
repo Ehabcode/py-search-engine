@@ -57,10 +57,27 @@ def compute_idf(token, documents):
         return 0
     return math.log(len(documents) / num_docs_with_token)
 
+
+def rank_results(results, query, documents):
+    query_tokens = tokenize(query)
+    scores = {}
+
+    for filename in results:
+        doc_tokens = tokenize(documents[filename])
+        total_score = 0
+        for token in query_tokens:
+            tf = compute_tf(token, doc_tokens)
+            idf = compute_idf(token, documents)
+            total_score += tf * idf
+        scores[filename] = total_score
+
+    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    return ranked
+
 if __name__ == "__main__":
     docs = load_documents(DATA_DIR)
     index = build_index(docs)
 
-
-    results = search(index, "python language")
-    print(results)
+    results = search(index, "python")
+ranked = rank_results(results, "python", docs)
+print(ranked)
