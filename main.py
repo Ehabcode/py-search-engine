@@ -1,5 +1,6 @@
 from pathlib import Path
 import string
+import math
 
 DATA_DIR = Path("data")
 
@@ -43,9 +44,23 @@ def search(index, query):
     return result
 
 
+def compute_tf(token, tokens):
+    return tokens.count(token) / len(tokens)
+
+
+def compute_idf(token, documents):
+    num_docs_with_token = 0
+    for text in documents.values():
+        if token in tokenize(text):
+            num_docs_with_token += 1
+    if num_docs_with_token == 0:
+        return 0
+    return math.log(len(documents) / num_docs_with_token)
+
 if __name__ == "__main__":
     docs = load_documents(DATA_DIR)
     index = build_index(docs)
+
 
     results = search(index, "python language")
     print(results)
