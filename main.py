@@ -1,6 +1,7 @@
 from pathlib import Path
 import string
 import math
+import argparse
 
 DATA_DIR = Path("data")
 
@@ -74,10 +75,20 @@ def rank_results(results, query, documents):
     ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     return ranked
 
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="A simple local search engine")
+    parser.add_argument("query" , nargs="+" , help="Words to search for")
+    args = parser.parse_args()
+
+    query = " ".join(args.query)
     docs = load_documents(DATA_DIR)
     index = build_index(docs)
+    results = search(index, query)
+    ranked = rank_results(results, query, docs)
 
-    results = search(index, "python")
-ranked = rank_results(results, "python", docs)
-print(ranked)
+    if not ranked:
+        print("No results found.")
+    else:
+        for filename, score in ranked:
+            print(f"{filename} (score: {score:.4f})")
